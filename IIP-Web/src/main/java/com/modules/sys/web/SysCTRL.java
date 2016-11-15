@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.json.JSONObject;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -20,8 +22,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.modules.sys.dto.Result;
+import com.modules.sys.entity.FileInfo;
 import com.modules.sys.entity.Plupload;
 import com.modules.sys.entity.User;
 import com.modules.sys.service.UserService;
@@ -172,45 +177,86 @@ public class SysCTRL {
 		Result r = activity.forceQuit(user.getUsername());
 		return r;
 	}
-	
-	
+
 	/** ==========================[上传附件]=========================== **/
 
 	@RequestMapping(value = "/upload", method = RequestMethod.GET)
 	public String uplod() {
 		return "upload1";
 	}
-	
+
+	/**
+	 * 上传图片
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/uploadImg", method = RequestMethod.POST)
+	public @ResponseBody
+	Result uploadImg(HttpServletRequest request, Plupload plupload)
+			throws IOException {
+		MultipartHttpServletRequest fileReq = (MultipartHttpServletRequest) request;
+		MultipartFile file = fileReq.getFile("file");
+		plupload.setMultipartFile(file);
+		FileInfo imgInfo = new FileInfo();
+		imgInfo.setName(file.getOriginalFilename());
+		imgInfo.setContentType(file.getContentType());
+		imgInfo.setLength(file.getSize());
+
+		JSONObject jsonStu = new JSONObject();
+		try {
+			Upload.upload(request, plupload,imgInfo);
+			// 判断文件是否上传成功（被分成块的文件是否全部上传完成）
+			if (!Upload.isUploadFinish(plupload)) {
+				jsonStu = JSONObject.fromObject(imgInfo);  
+			}
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+		return Result.data(jsonStu);
+	}
+
 	/**
 	 * 文件上传
+	 * 
 	 * @param request
 	 * @param plupload
 	 * @return
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public @ResponseBody Result uload(HttpServletRequest request, Plupload plupload) throws IOException {
-        try{
-        	Upload.upload(request,plupload);
-        	//判断文件是否上传成功（被分成块的文件是否全部上传完成）
-           /* if (Upload.isUploadFinish(plupload)) {
-                System.out.println("name="+plupload.getName() + "----id="+plupload.getId());
-            }*/
-        }catch(IllegalStateException e){
-        	e.printStackTrace();
-        }
-        //return Result.data(fileInfo);
-        return Result.data(plupload.getName());
+	public @ResponseBody
+	Result uload(HttpServletRequest request, Plupload plupload)
+			throws IOException {
+
+		MultipartHttpServletRequest fileReq = (MultipartHttpServletRequest) request;
+		MultipartFile file = fileReq.getFile("file");
+		plupload.setMultipartFile(file);
+
+		try {
+			Upload.upload(request, plupload);
+			// 判断文件是否上传成功（被分成块的文件是否全部上传完成）
+			/*
+			 * if (Upload.isUploadFinish(plupload)) {
+			 * System.out.println("name="+plupload.getName() +
+			 * "----id="+plupload.getId()); }
+			 */
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+		// return Result.data(fileInfo);
+		return Result.data(plupload.getName());
 	}
-	
+
 	/**
 	 * 事务测试
+	 * 
 	 * @return
 	 */
-	
+
 	@Transactional
-	@RequestMapping(value="test/1",method=RequestMethod.GET)
-	public String gotoTransaction(){
+	@RequestMapping(value = "test/1", method = RequestMethod.GET)
+	public String gotoTransaction() {
 		User user = new User();
 		user.setUsername("10086");
 		user.setPassword("123");
@@ -218,17 +264,17 @@ public class SysCTRL {
 		service.save(user);
 		return "/chat.jsp";
 	}
-	
+
 	@Transactional
-	@RequestMapping(value="test/2",method=RequestMethod.GET)
-	public String gotoTransaction2(){
+	@RequestMapping(value = "test/2", method = RequestMethod.GET)
+	public String gotoTransaction2() {
 		User user = new User();
 		user.setUsername("10086");
 		user.setPassword("123");
 		user.setRoleId("2");
 		service.save(user);
-		
-		System.out.println(1000/0);
+
+		System.out.println(1000 / 0);
 		return "/chat.jsp";
 	}
 }

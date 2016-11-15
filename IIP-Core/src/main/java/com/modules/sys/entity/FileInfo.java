@@ -2,7 +2,7 @@ package com.modules.sys.entity;
 
 public class FileInfo {
 
-private String id;
+	private String id;
 	
 	/** 文件名称 **/
 	private String name;

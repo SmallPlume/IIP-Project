@@ -9,14 +9,16 @@
 <meta name="renderer" content="webkit">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<link rel="stylesheet" href="//res.layui.com/layui/build/css/layui.css"  media="all">
+<link rel="stylesheet" href="${basePath}/layer/css/layui.css"  media="all">
 <script type="text/javascript" src="${basePath}/layer/layui.js"></script>
 <script type="text/javascript">
 layui.use('upload', function(){
   layui.upload({
-    url: basePath+"/upload", //上传接口
+    url: basePath+"/uploadImg", //上传接口
     success: function(res){ //上传成功后的回调
-      console.log(res)
+      console.log(res);
+      //alert(res.data.path);
+      $('#img').css('background-image','url('+res.data.path+')');
     }
   });
   
@@ -47,7 +49,7 @@ layui.use('upload', function(){
 				</fieldset>
 
 				<div class="site-demo-upload">
-					<img id="LAY_demo_upload" src="http://layer.layui.com/images/tong.jpg">
+					<div id="img" style="width:500px; height:300px;"></div>
 					<div class="site-demo-upbar">
 						<input type="file" name="file" class="layui-upload-file" id="test">
 					</div>

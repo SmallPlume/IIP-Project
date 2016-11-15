@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.modules.sys.entity.FileInfo;
 import com.modules.sys.entity.Plupload;
 
 public class Upload {
@@ -41,13 +42,38 @@ public class Upload {
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
-	public static void upload(HttpServletRequest request, Plupload plupload) throws IllegalStateException, IOException {
+	public static void upload(HttpServletRequest request, Plupload plupload,FileInfo file) throws IllegalStateException, IOException {
 		// 文件存储路径
 		Date day = new Date();// 获取时间
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		String path = format.format(day);
 		File dir = new File(request.getSession().getServletContext().getRealPath("/") + FileDir + "/" + path);
 
+		// 生成唯一的文件名
+		String filename = plupload.getMultipartFile().getOriginalFilename();
+
+		String imgPath = dir.getPath() + "\\" + filename;
+		file.setPath(imgPath.replace("\\", "/"));
+		upload(request, plupload, dir, filename);
+	}
+	
+	/**
+	 * 用于Plupload插件的文件上传,自动生成唯一的文件保存名
+	 * 
+	 * @param plupload
+	 *            - 存放上传所需参数的bean
+	 * @param dir
+	 *            - 保存目标文件目录
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
+	public static void upload(HttpServletRequest request, Plupload plupload) throws IllegalStateException, IOException {
+		// 文件存储路径
+		Date day = new Date();// 获取时间
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String path = format.format(day);
+		File dir = new File(request.getSession().getServletContext().getRealPath("/") + FileDir + "/" + path);
+		
 		// 生成唯一的文件名
 		String filename = plupload.getName();
 		upload(request, plupload, dir, filename);

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.modules.sys.dao.FileDAO">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="com.modules.sys.entity.FileInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into t_file(name,length,contentType,extName,path,status)
+		values(#{name},#{length},#{contentType},#{extName},#{path},#{status})
+	</insert>
+
+	<!-- 删除 -->
+	<delete id="delt" parameterType="java.lang.String">
+		delete from t_file where id=#{id}
+	</delete>
+	
+	<!-- 根据id查询 -->
+	<select id="getById" parameterType="java.lang.String" resultType="com.modules.sys.entity.FileInfo">
+		select id,name,length,contentType,extName,path,status from t_file where id=#{id}
+	</select>
+</mapper>

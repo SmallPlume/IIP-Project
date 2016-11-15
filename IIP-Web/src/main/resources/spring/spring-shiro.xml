@@ -120,13 +120,11 @@
 				<!-- 静态资源 -->
 				/css/**=anon
 				/js/**=anon
-				/ico/**=anon
+				/layer/**=anon
 				/images/**=anon
 				/upload/**=anon
 				/ueditor/**=anon
-				/layer/**=anon
 				/upload=anon
-				/amq/**=anon
 				<!-- alibaba的druid监控器 -->
 				<!-- /druid/**=anyRoles["admin"] -->
 				<!-- /user/**=roles["admin"] -->
